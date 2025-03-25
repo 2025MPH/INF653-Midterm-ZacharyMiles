@@ -1,12 +1,12 @@
 <?php
 class Database {
     private $conn;
-    // Local testing credentials:
+    // Render credentials:
     private $host = 'dpg-cvfjpn52ng1s73d7glj0-a.ohio-postgres.render.com';
     private $port = '5432';
     private $dbname = 'quotesdb';
-    private $username = 'zsmiles';     // Use 'postgres' for local testing
-    private $password = 'Btab0uFR0RKNGjxKnZJyuRpOq4k8FvQI';     // Replace with your local PostgreSQL password if different 
+    private $username = 'zsmiles';
+    private $password = 'Btab0uFR0RKNGjxKnZJyuRpOq4k8FvQI';
 
     public function connect() {
         if ($this->conn) {
