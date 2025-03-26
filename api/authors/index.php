@@ -1,30 +1,65 @@
 <?php
-header("Content-Type: application/json");
+    // Index for authors
+     header('Access-Control-Allow-Origin: *');
+     header('Content-Type: application/json');
+     $method = $_SERVER['REQUEST_METHOD'];
+ 
+     if ($method === 'OPTIONS')
+     {
+         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+         header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+         exit();
+     } 
 
-include_once '../../config/Database.php';
-include_once '../../models/Author.php';
+     // If statement for type of request
 
-$database = new Database();
-$db = $database->connect();
+     if ($method === 'GET') 
+     {
+        try {
+            if (isset($_GET['id']) )
+            require_once 'read_single.php' ;
+           else
+            require_once 'read.php';
 
-$aut = new Author($db);
-$result = $aut->read();  // Returns all authors
-$num = $result->rowCount();
+        }
+        catch(ErrorException $e)
+        {
+            echo("Required file not found!");
+        
+        }
+     }
+     else if ($method === 'POST') {
+        try {
+            require_once 'create.php';
 
-$authors_arr = array();
+        }
+        catch(ErrorException $e)
+        {
+            echo("Required file not found!");
+        
+        }
+     }
+     else if ($method === 'PUT') {
+        try {
+            require_once 'update.php';
 
-if ($num > 0) {
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        extract($row);
-        $author_item = array(
-            "id" => $id,
-            "author" => $author
-        );
-        $authors_arr[] = $author_item;
-    }
-    echo json_encode($authors_arr);
-} else {
-    // Return empty array if no authors found
-    echo json_encode([]);
-}
-?>
+        }
+        catch(ErrorException $e)
+        {
+            echo("Required file not found!");
+        
+        }
+     }
+     else if ($method === 'DELETE') {
+        try {
+            require_once 'delete.php';
+
+        }
+        catch(ErrorException $e)
+        {
+            echo("Required file not found!");
+        
+        }
+     }
+     else
+        echo ("No function requested");
