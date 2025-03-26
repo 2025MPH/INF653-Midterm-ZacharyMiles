@@ -1,76 +1,149 @@
 <?php
-class Category {
-    // Database connection and table name
-    private $conn;
-    private $table = "categories";
+    //category class
+    class Category{
+        private $conn;
+        private $table = 'categories';
 
-    // Object properties
-    public $id;
-    public $category;
+        public $id;
+        public $category;
 
-    // Constructor with DB connection
-    public function __construct($db) {
-        $this->conn = $db;
-    }
-
-    // Read all categories – returns a PDOStatement
-    public function readAll() {
-        $query = "SELECT id, category FROM " . $this->table . " ORDER BY id ASC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
-    }
-
-    // Read single category – sets object properties if found
-    public function read_single() {
-        $query = "SELECT id, category FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->id);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if($row){
-            $this->id = $row['id'];
-            $this->category = $row['category'];
+        //connection
+        public function __construct($db) {
+            $this->conn = $db;
         }
-    }
 
-    // Create new category – returns true if successful
-    public function create() {
-        $query = "INSERT INTO " . $this->table . " SET category = :category";
-        $stmt = $this->conn->prepare($query);
-        $this->category = htmlspecialchars(strip_tags($this->category));
-        $stmt->bindParam(':category', $this->category);
-        if($stmt->execute()){
-            $this->id = $this->conn->lastInsertId();
+        //read function
+        public function read(){
+            //Create query
+            $query = "SELECT
+                        id,
+                        category
+                        FROM " . $this->table . "
+                        ORDER BY id ASC";
+            
+            //Prepare statement
+            $stmt = $this->conn->prepare($query);
+
+            //execute
+            $stmt->execute();
+
+            //return statement
+            return $stmt;
+        }
+
+        public function read_single(){
+            //Create query
+            $query = "SELECT
+                        id,
+                        category
+                        FROM " . $this->table ."
+                        WHERE id = :id
+                        LIMIT 1 OFFSET 0";
+            
+            //prepare statement
+            $stmt= $this->conn->prepare($query);
+
+            //Clean data
+            $this->id = htmlspecialchars(strip_tags($this->id));
+
+            //bind data
+            $stmt->bindParam(':id', $this->id);
+
+            //execute
+            $stmt->execute();
+
+            //retrieve data
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            //Set the data
+            if($row){
+                $this->id = $row['id'];
+                $this->category = $row['category'];
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public function create() {
+            //create a category
+            $query = "INSERT INTO " . $this->table ." (category) VALUES (:category)";
+
+            //prepare statement
+            $stmt= $this->conn->prepare($query);
+
+            //clean data
+            $this->category = htmlspecialchars(strip_tags($this->category));
+    
+            //bind data
+            $stmt->bindParam(':category', $this->category);
+
+             //execute
+            $stmt->execute();
+
+            if($stmt->execute()){
+                return true;
+            } else {
+                printf("Error: %s. \n", $stmt->error);
+                return false;
+            }
+        }
+    
+       //Update Post
+       public function update(){
+        // Create query
+        $query = 'UPDATE ' . $this->table . '
+          SET
+            category = :category
+          WHERE
+            id = :id';
+        
+        //PREPARE STMT
+         $stmt = $this->conn->prepare($query);
+
+         //clean DATA
+         $this->category = htmlspecialchars(strip_tags($this->category));
+         $this->id = htmlspecialchars(strip_tags($this->id));
+        
+         //Bind data
+         $stmt->bindParam(':category', $this->category);
+         $stmt->bindParam(':id', $this->id);
+
+         //Execute query
+         if($stmt->execute()){
             return true;
-        }
-        return false;
+         }
+
+         //print error if something goes wrong
+         printf("Error: %s.\n", $stmt->error);
+
+         return false;
+
     }
 
-    // Update an existing category – returns true if successful
-    public function update() {
-        $query = "UPDATE " . $this->table . " SET category = :category WHERE id = :id";
+    //Delete post
+    public function delete(){
+        // Create query
+        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+
+        //prepare statement
         $stmt = $this->conn->prepare($query);
-        $this->category = htmlspecialchars(strip_tags($this->category));
+
+        //clean data
         $this->id = htmlspecialchars(strip_tags($this->id));
-        $stmt->bindParam(':category', $this->category);
-        $stmt->bindParam(':id', $this->id);
-        if($stmt->execute()){
-            return true;
-        }
-        return false;
-    }
 
-    // Delete a category – returns true if successful
-    public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $this->id = htmlspecialchars(strip_tags($this->id));
+        //bind data
         $stmt->bindParam(':id', $this->id);
+
+        //Execute query
         if($stmt->execute()){
             return true;
-        }
-        return false;
+         } else {
+
+         //print error if something goes wrong
+         printf("Error: %s.\n", $stmt->error);
+
+         return false;
+         }
     }
 }
-?>

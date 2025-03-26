@@ -1,25 +1,31 @@
 <?php
-header("Content-Type: application/json");
+    //Headers
+    header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Methods: DELETE');
+    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
 
-include_once '../../config/Database.php';
-include_once '../../models/Category.php';
+    include_once '../../config/Database.php';
+    include_once '../../models/Category.php';
 
-$database = new Database();
-$db = $database->connect();
 
-$category = new Category($db);
-$data = json_decode(file_get_contents("php://input"));
+    //Instantiate DB and CONNECT
+    $database = new Database();
+    $db = $database->connect();
 
-if (!isset($data->id)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
 
-$category->id = $data->id;
+    //Instantiate blog category object
+    $cat = new Category($db);
 
-if ($category->delete()) {
-    echo json_encode(["id" => $category->id]);
-} else {
-    echo json_encode(["message" => "No Categories Found"]);
-}
-?>
+    //Get the raw posted data
+    $data = json_decode(file_get_contents("php://input"));
+
+    //data is not set
+    if(!isset($data->id)){
+        echo(json_encode(array('message' => 'Missing Required Parameters')));
+        exit();
+    } else { //else delete
+        $cat->id = $data->id;
+        $cat->delete();
+        echo(json_encode(array('id' => $cat->id)));
+    }

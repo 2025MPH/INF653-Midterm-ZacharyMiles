@@ -1,37 +1,48 @@
 <?php
-header("Content-Type: application/json");
+    //Headers
+    header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
 
-include_once '../../config/Database.php';
-include_once '../../models/Quote.php';
+    include_once '../../config/Database.php';
+    include_once '../../models/Author.php';
 
-$database = new Database();
-$db = $database->connect();
 
-$quote = new Quote($db);
+    //Instantiate DB and CONNECT
+    $database = new Database();
+    $db = $database->connect();
 
-// Get filter parameters if set
-$author_id   = isset($_GET['author_id']) ? $_GET['author_id'] : null;
-$category_id = isset($_GET['category_id']) ? $_GET['category_id'] : null;
 
-$result = $quote->readFiltered($author_id, $category_id); // Must apply filters and join for author and category names
-$num = $result->rowCount();
+    //Instantiate blog author object
+    $aut = new Author($db);
 
-$quotes_arr = array();
+    //Blog author query
+    $result = $aut->read();
 
-if ($num > 0) {
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        extract($row);
-        $quote_item = array(
-            "id"       => $id,
-            "quote"    => $quote,
-            "author"   => $author,
-            "category" => $category
+    //Get row count
+    $num = $result->rowCount();
+
+    //Check if any categories
+    if($num>0){
+        // author array
+        $author_arr = array();
+
+        while($row = $result->fetch(PDO::FETCH_ASSOC)){
+            extract($row);
+
+            $author_item = array(
+                'id' => $id,
+                'author' => $author
+            );
+
+            //push to "data
+            array_push($author_arr, $author_item);
+        }
+
+        //Turn to JSON & output
+        echo json_encode($author_arr);
+    } else {
+        //NO author
+        echo json_encode(
+            array('message' => 'author_id Not Found')
         );
-        $quotes_arr[] = $quote_item;
     }
-    echo json_encode($quotes_arr);
-} else {
-    // Always return an array (empty array if no results)
-    echo json_encode([]);
-}
-?>
