@@ -1,33 +1,29 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
-
     include_once '../../config/Database.php';
     include_once '../../models/Author.php';
 
-
-    //Instantiate DB and CONNECT
+    // Instantiate DB & connect
     $database = new Database();
     $db = $database->connect();
 
+    // Instantiate authors object
+    $author = new Author($db);
 
-    //Instantiate blog author object
-    $aut = new Author($db);
+    // GET ID
+    $author->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-    //GET ID
-    $aut->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
+    //Get post
+    $author->read_single();
 
-    //GET author
-   if( $aut->read_single()){
-        echo json_encode(array(
-            'id' => $aut->id,
-            'author' => $aut->author
-        ));
-   }
-//cannot find id
-   else {
-    echo json_encode(array(
-        'message' => 'author_id Not Found'
-    ));
-   }
+    //Create array
+    if((isset($author->id) && isset($author->author))){
+        $author_arr = array(
+            'id'            => $author->id,
+            'author'        => $author->author,
+        );
+    
+        // Make JSON
+        print_r(json_encode($author_arr));
+      }else{
+        print_r(json_encode(array("message" => "author_id Not Found")));
+      }

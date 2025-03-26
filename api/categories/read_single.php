@@ -1,33 +1,29 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
-
     include_once '../../config/Database.php';
     include_once '../../models/Category.php';
 
-
-    //Instantiate DB and CONNECT
+    // Instantiate DB & connect
     $database = new Database();
     $db = $database->connect();
 
+    // Instantiate category object
+    $category = new Category($db);
 
-    //Instantiate blog category object
-    $cat = new Category($db);
+    // GET ID
+    $category->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-    //GET ID
-    $cat->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
+    //Get category
+    $category->read_single();
 
-    //GET category
-   if( $cat->read_single()){
-        echo json_encode(array(
-            'id' => $cat->id,
-            'category' => $cat->category
-        ));
-   }
-//cannot find id
-   else {
-    echo json_encode(array(
-        'message' => 'category_id Not Found'
-    ));
-   }
+    //Create array
+    if((isset($category->id) && isset($category->category))){
+        $category_arr = array(
+            'id'            => $category->id,
+            'category'      => $category->category,
+        );
+
+        // Make JSON
+        print_r(json_encode($category_arr));
+    }else{
+        print_r(json_encode(array("message" => "category_id Not Found")));
+    }

@@ -1,63 +1,28 @@
 <?php
-    //index for categories
-     header('Access-Control-Allow-Origin: *');
-     header('Content-Type: application/json');
-     $method = $_SERVER['REQUEST_METHOD'];
- 
-     if ($method === 'OPTIONS') {
-         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-         header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-         exit();
-     } 
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
 
+$param_passed = isset($_GET['id']) ? $_GET['id'] : null;
 
-     // If statement for type of request
-     if ($method === 'GET') {
-        try {
-            if (isset($_GET['id']) )
-            require_once 'read_single.php' ;
-           else
-            require_once 'read.php';
+if ($method === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+    exit();
+}
 
-        }
-        catch(ErrorException $e)
-        {
-            echo("Required file not found!");
-        
-        }
-     }
-     else if ($method === 'POST') {
-        try {
-            require_once 'create.php';
+if($method === 'GET'){
+  if(isset($param_passed)){
+    include_once 'read_single.php';
+  }else{
+    include_once 'read.php';
+  }
+} else if($method === 'POST'){
+  include_once 'create.php';
+} else if($method === 'PUT'){
+  include_once 'update.php';
+}else if($method === 'DELETE'){
+  include_once 'delete.php';
+}
 
-        }
-        catch(ErrorException $e)
-        {
-            echo("Required file not found!");
-        
-        }
-     }
-     else if ($method === 'PUT') {
-        try {
-            require_once 'update.php';
-
-        }
-        catch(ErrorException $e)
-        {
-            echo("Required file not found!");
-        
-        }
-     }
-     else if ($method === 'DELETE') {
-        try {
-            require_once 'delete.php';
-
-        }
-        catch(ErrorException $e)
-        {
-            echo("Required file not found!");
-        
-        }
-     }
-     else
-        echo ("No function requested");
+?>

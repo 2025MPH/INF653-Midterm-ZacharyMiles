@@ -1,32 +1,38 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Methods: POST');
-    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
-
+    // Headers
+    
     include_once '../../config/Database.php';
     include_once '../../models/Category.php';
 
-
-    //Instantiate DB and CONNECT
+    // Instantiate DB & connect
     $database = new Database();
     $db = $database->connect();
 
+    // Instantiate category object
+    $category = new Category($db);
 
-    //Instantiate blog quote object
-    $cat = new Category($db);
-
-    //Get the raw posted data
+    // Get raw posted data
     $data = json_decode(file_get_contents("php://input"));
 
-    //if data is not all set, send error message and exit
-    if ( !isset($data->category) )
-    {
-        echo json_encode(array('message' => 'Missing Required Parameters'));
-    } else {
-        $cat->category = $data->category;
-        $cat->create();
-        echo json_encode(array('id' => $db->lastInsertId(), 'category'=>$cat->category));
+    $category->category = isset($data->category) ? $data->category : null;
 
+
+    if(isset($category->category)){
+        $category_id = $category->create();
+
+        //Create category
+        if($category_id){
+            //Create array
+            $category_arr = array(
+                'id'              => $category_id,
+                'category'        => $category->category,
+            );
+
+            // Make JSON
+            print_r(json_encode($category_arr));
+        }
+    }else{
+        echo json_encode(
+            array('message' => 'Missing Required Parameters')
+        ); 
     }
