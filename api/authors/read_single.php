@@ -1,33 +1,29 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
+header("Content-Type: application/json");
 
-    include_once '../../config/Database.php';
-    include_once '../../models/Author.php';
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
+$database = new Database();
+$db = $database->connect();
 
-    //Instantiate DB and CONNECT
-    $database = new Database();
-    $db = $database->connect();
+$author = new Author($db);
+$author->id = isset($_GET['id']) ? $_GET['id'] : null;
 
+if ($author->id == null) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+}
 
-    //Instantiate blog author object
-    $aut = new Author($db);
+$author->read_single();  // Should set $author->author
 
-    //GET ID
-    $aut->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
-
-    //GET author
-   if( $aut->read_single()){
-        echo json_encode(array(
-            'id' => $aut->id,
-            'author' => $aut->author
-        ));
-   }
-//cannot find id
-   else {
-    echo json_encode(array(
-        'message' => 'author_id Not Found'
-    ));
-   }
+if ($author->author != null) {
+    $author_item = array(
+        "id" => $author->id,
+        "author" => $author->author
+    );
+    echo json_encode($author_item);
+} else {
+    echo json_encode(["message" => "author_id Not Found"]);
+}
+?>

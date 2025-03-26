@@ -1,33 +1,29 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
+header("Content-Type: application/json");
 
-    include_once '../../config/Database.php';
-    include_once '../../models/Category.php';
+include_once '../../config/Database.php';
+include_once '../../models/Category.php';
 
+$database = new Database();
+$db = $database->connect();
 
-    //Instantiate DB and CONNECT
-    $database = new Database();
-    $db = $database->connect();
+$category = new Category($db);
+$category->id = isset($_GET['id']) ? $_GET['id'] : null;
 
+if ($category->id == null) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+}
 
-    //Instantiate blog category object
-    $cat = new Category($db);
+$category->read_single();  // Should set $category->category
 
-    //GET ID
-    $cat->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
-
-    //GET category
-   if( $cat->read_single()){
-        echo json_encode(array(
-            'id' => $cat->id,
-            'category' => $cat->category
-        ));
-   }
-//cannot find id
-   else {
-    echo json_encode(array(
-        'message' => 'category_id Not Found'
-    ));
-   }
+if ($category->category != null) {
+    $category_item = array(
+        "id" => $category->id,
+        "category" => $category->category
+    );
+    echo json_encode($category_item);
+} else {
+    echo json_encode(["message" => "category_id Not Found"]);
+}
+?>
