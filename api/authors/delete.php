@@ -1,31 +1,27 @@
 <?php
-    include_once '../../config/Database.php';
-    include_once '../../models/Author.php';
+header("Content-Type: application/json");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: DELETE');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
-    // Instantiate author object
-    $author = new Author($db);
+$database = new Database();
+$db = $database->connect();
 
-    // Get raw posted data
-    $data = json_decode(file_get_contents("php://input"));
+$aut = new Author($db);
+$data = json_decode(file_get_contents("php://input"));
 
-    // Set ID to update
-    $author->id = $data->id;
-
-    //Delete author
-    if($author->delete()){
-        //Create array
-        $author_arr = array(
-            'id'            => $author->id,
-        );
-
-        // Make JSON
-        print_r(json_encode($author_arr));
-    }else{
-        echo json_encode(
-            array('message' => 'Author Not Deleted')
-        );  
+if (!isset($data->id)) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+} else {
+    $aut->id = $data->id;
+    if ($aut->delete()){
+        echo json_encode(["id" => $aut->id]);
+    } else {
+        echo json_encode(["message" => "No Authors Found"]);
     }
+}
+?>

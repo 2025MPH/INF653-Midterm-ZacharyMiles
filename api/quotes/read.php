@@ -1,46 +1,37 @@
 <?php
-    // Headers
-    include_once '../../config/Database.php';
-    include_once '../../models/Quote.php';
+header("Content-Type: application/json");
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-    // Instantiate category object
-    $quote = new Quote($db);
+$database = new Database();
+$db = $database->connect();
 
-    // Quotes quote query
-    $result = $quote->read();
-    // Get row count
-    $num = $result->rowCount();
+$quote = new Quote($db);
 
-    // Check if any quotes
-    if($num > 0){
-        // Quotes array
-        $quotes_arr = array();
+// Get filter parameters (if provided)
+$author_id   = isset($_GET['author_id']) ? $_GET['author_id'] : null;
+$category_id = isset($_GET['category_id']) ? $_GET['category_id'] : null;
 
-        while($row = $result->fetch(PDO::FETCH_ASSOC)){
-            extract($row);
+$result = $quote->readFiltered($author_id, $category_id); // Must return joined data: id, quote, author, category
+$num = $result->rowCount();
 
-            $quote_item = array(
-                'id'            => $id,
-                'quote'         => $quote,
-                'author'        => $author,
-                'category'      => $category
-            );
+$quotes_arr = array();
 
-            //Push to "data"
-            array_push($quotes_arr, $quote_item);
-        }
-
-        // Turn to JSON and output
-        echo json_encode($quotes_arr);
-    }else{
-        // No Categories
-        echo json_encode(
-            array(
-                'message' => 'No Quotes Found'
-            )
+if ($num > 0) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        extract($row);
+        $quote_item = array(
+            "id"       => $id,
+            "quote"    => $quote,
+            "author"   => $author,
+            "category" => $category
         );
+        $quotes_arr[] = $quote_item;
     }
+    echo json_encode($quotes_arr);
+} else {
+    // Always return an array (empty array if no matches)
+    echo json_encode([]);
+}
+?>

@@ -1,31 +1,27 @@
 <?php
-    include_once '../../config/Database.php';
-    include_once '../../models/Category.php';
+header("Content-Type: application/json");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: DELETE');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Category.php';
 
-    // Instantiate category object
-    $category = new Category($db);
+$database = new Database();
+$db = $database->connect();
 
-    // Get raw posted data
-    $data = json_decode(file_get_contents("php://input"));
+$cat = new Category($db);
+$data = json_decode(file_get_contents("php://input"));
 
-    // Set ID to update
-    $category->id = $data->id;
-
-    //Delete category
-    if($category->delete()){
-        //Create array
-        $category_arr = array(
-            'id'            => $category->id,
-        );
-
-        // Make JSON
-        print_r(json_encode($category_arr));
-    }else{
-        echo json_encode(
-            array('message' => 'Category Not Deleted')
-        );  
+if (!isset($data->id)) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+} else {
+    $cat->id = $data->id;
+    if ($cat->delete()){
+        echo json_encode(["id" => $cat->id]);
+    } else {
+        echo json_encode(["message" => "No Categories Found"]);
     }
+}
+?>

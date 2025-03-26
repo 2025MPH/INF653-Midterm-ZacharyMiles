@@ -1,29 +1,21 @@
 <?php
-    include_once '../../config/Database.php';
-    include_once '../../models/Author.php';
+header("Content-Type: application/json");
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
-    // Instantiate authors object
-    $author = new Author($db);
+$database = new Database();
+$db = $database->connect();
 
-    // GET ID
-    $author->id = isset($_GET['id']) ? $_GET['id'] : die();
+$aut = new Author($db);
+$aut->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-    //Get post
-    $author->read_single();
-
-    //Create array
-    if((isset($author->id) && isset($author->author))){
-        $author_arr = array(
-            'id'            => $author->id,
-            'author'        => $author->author,
-        );
-    
-        // Make JSON
-        print_r(json_encode($author_arr));
-      }else{
-        print_r(json_encode(array("message" => "author_id Not Found")));
-      }
+if ($aut->read_single()) {
+    echo json_encode([
+        "id" => $aut->id,
+        "author" => $aut->author
+    ]);
+} else {
+    echo json_encode(["message" => "author_id Not Found"]);
+}
+?>

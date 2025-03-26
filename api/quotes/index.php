@@ -1,28 +1,33 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-$method = $_SERVER['REQUEST_METHOD'];
+header("Content-Type: application/json");
 
-$param_passed = isset($_GET['id']) ? $_GET['id'] : null;
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-if ($method === 'OPTIONS') {
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-    exit();
+$database = new Database();
+$db = $database->connect();
+
+$quote = new Quote($db);
+$result = $quote->readAll(); // This method should join authors and categories to return: id, quote, author, category
+$num = $result->rowCount();
+
+$quotes_arr = array();
+
+if ($num > 0) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        // Each row must have: id, quote, author, category
+        extract($row);
+        $quote_item = array(
+            "id"       => $id,
+            "quote"    => $quote,
+            "author"   => $author,
+            "category" => $category
+        );
+        $quotes_arr[] = $quote_item;
+    }
+    echo json_encode($quotes_arr);
+} else {
+    // Return an empty array when no quotes exist
+    echo json_encode([]);
 }
-
-if($method === 'GET'){
-  if(isset($param_passed)){
-    include_once 'read_single.php';
-  }else{
-    include_once 'read.php';
-  }
-} else if($method === 'POST'){
-  include_once 'create.php';
-} else if($method === 'PUT'){
-  include_once 'update.php';
-}else if($method === 'DELETE'){
-  include_once 'delete.php';
-}
-
 ?>

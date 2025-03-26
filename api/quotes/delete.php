@@ -1,37 +1,28 @@
 <?php
-    include_once '../../config/Database.php';
-    include_once '../../models/Quote.php';
+header("Content-Type: application/json");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: DELETE');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-    // Instantiate quote object
-    $quote = new Quote($db);
+$database = new Database();
+$db = $database->connect();
 
-    // Get raw posted data
-    $data = json_decode(file_get_contents("php://input"));
+$quo = new Quote($db);
+$data = json_decode(file_get_contents("php://input"));
 
-    // Set ID to update
-    $quote->id = isset($data->id) ? $data->id : null;
+if (!isset($data->id)) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+}
 
-    //Delete quote
-    if(isset($quote->id)){
-        if($quote->delete()){
-            //Create array
-            $quote_arr = array(
-                'id'            => $quote->id,
-            );
+$quo->id = $data->id;
 
-            // Make JSON
-            print_r(json_encode($quote_arr));
-        }else{
-            echo json_encode(
-                array('message' => 'No Quotes Found')
-            );  
-        }
-    }else{
-        echo json_encode(
-            array('message' => 'No Quotes Found')
-        ); 
-    }
+if ($quo->delete()) {
+    echo json_encode(["id" => $quo->id]);
+} else {
+    echo json_encode(["message" => "No Quotes Found"]);
+}
+?>

@@ -1,31 +1,32 @@
 <?php
-    include_once '../../config/Database.php';
-    include_once '../../models/Quote.php';
+header("Content-Type: application/json");
 
-    // Instantiate DB & connect
-    $database = new Database();
-    $db = $database->connect();
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-    // Instantiate quote object
-    $quote = new Quote($db);
+$database = new Database();
+$db = $database->connect();
 
-    // GET ID
-    $quote->id = isset($_GET['id']) ? $_GET['id'] : die();
+$quote = new Quote($db);
 
-    //Get quote
-    $quote->read_single();
+// Get id from query string
+$quote->id = isset($_GET['id']) ? $_GET['id'] : null;
+if ($quote->id == null) {
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+}
 
-    //Create array
-    if((isset($quote->id) && isset($quote->quote))){
-    $quote_arr = array(
-        'id'            => $quote->id,
-        'quote'         => $quote->quote,
-        'author'        => $quote->author,
-        'category'      => $quote->category,
+$quote->read_single(); // Should set properties: id, quote, author, category
+
+if ($quote->quote != null) {
+    $quote_item = array(
+        "id"       => $quote->id,
+        "quote"    => $quote->quote,
+        "author"   => $quote->author,
+        "category" => $quote->category
     );
-
-    // Make JSON
-    print_r(json_encode($quote_arr));
-    }else{
-        print_r(json_encode(array("message" => "No Quotes Found")));
-    }
+    echo json_encode($quote_item);
+} else {
+    echo json_encode(["message" => "No Quotes Found"]);
+}
+?>
