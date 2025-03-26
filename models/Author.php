@@ -138,12 +138,8 @@
         //Execute query
         if($stmt->execute()){
             return true;
-         } else {
-
-         //print error if something goes wrong
-         printf("Error: %s.\n", $stmt->error);
-
-         return false;
-         }
+        }
+        return false;
     }
 }
+?>
