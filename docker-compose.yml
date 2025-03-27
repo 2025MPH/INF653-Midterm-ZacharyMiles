@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: my-vscode-project
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - USERNAME=zsmiles
+      - PASSWORD=Btab0uFR0RKNGjxKnZJyuRpOq4k8FvQI
+      - DBNAME=quotesdb
+      - HOST=dpg-cvfjpn52ng1s73d7glj0-a.ohio-postgres.render.com
+      - PORT=5432
+    restart: always
