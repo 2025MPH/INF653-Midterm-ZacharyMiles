@@ -1,28 +1,39 @@
 <?php
-header("Content-Type: application/json");
+    //Headers
+    header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
 
-include_once '../../config/Database.php';
-include_once '../../models/Quote.php';
+    include_once '../../config/Database.php';
+    include_once '../../models/Quote.php';
 
-$database = new Database();
-$db = $database->connect();
 
-$quo = new Quote($db);
-$quo->id = isset($_GET['id']) ? $_GET['id'] : null;
-if ($quo->id == null) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+    //Instantiate DB and CONNECT
+    $database = new Database();
+    $db = $database->connect();
 
-if ($quo->read_single()){
-    $quote_item = array(
-        "id"       => $quo->id,
-        "quote"    => $quo->quote,
-        "author"   => $quo->author,
-        "category" => $quo->category
-    );
-    echo json_encode($quote_item);
-} else {
-    echo json_encode(["message" => "No Quotes Found"]);
-}
-?>
+
+    //Instantiate blog quote object
+    $quo = new Quote($db);
+
+    //GET ID
+    $quo->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
+
+    //GET quote
+    if ($quo->read_single()){
+
+    //create array
+        $quote_arr = array(
+            'id' => $quo->id,
+            'quote' => $quo->quote,
+            'author' => $quo->author,
+            'category' => $quo->category
+
+        );
+    } else {
+        $quote_arr = array(
+            'message' => 'No Quotes Found'
+        );
+    }
+
+    //Make JSON
+    print_r(json_encode($quote_arr));
