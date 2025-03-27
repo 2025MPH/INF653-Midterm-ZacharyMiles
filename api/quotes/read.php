@@ -1,47 +1,60 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
- 
-    include_once '../../config/Database.php';
-    include_once '../../models/Quote.php';
- 
-    // Instantiate DB and CONNECT
-    $database = new Database();
-    $db = $database->connect();
- 
-    // Instantiate quote object
-    $quotes = new Quote($db);
- 
-    // Apply filters if provided
-    if (isset($_GET['author_id'])) {
-        $quotes->author_id = $_GET['author_id'];
+/**
+ * read.php
+ * 
+ * This file retrieves a list of quotes from the database. It supports optional filtering 
+ * by author_id and/or category_id via GET parameters. It always returns a JSON array.
+ * If no records are found, it returns an empty array.
+ */
+
+// Set CORS and content-type headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+
+// Include necessary files for database connection and Quote model
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
+
+// Create a new Database instance and establish a connection
+$database = new Database();
+$db = $database->connect();
+
+// Instantiate the Quote model
+$quotes = new Quote($db);
+
+// If filtering parameters are provided in the URL, assign them to the model
+if (isset($_GET['author_id'])) {
+    $quotes->author_id = $_GET['author_id'];
+}
+if (isset($_GET['category_id'])) {
+    $quotes->category_id = $_GET['category_id'];
+}
+
+// Execute the query using the read() method from the model
+$result = $quotes->read();
+$num = $result->rowCount();
+
+// Initialize an array to store quote objects
+$quotes_arr = array();
+
+// If records exist, build the array
+if ($num > 0) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        // Extract the row fields into variables
+        extract($row);
+        // Create an associative array for each quote
+        $quote_item = array(
+            'id'       => $id,
+            'quote'    => html_entity_decode($quote),
+            'author'   => $author,
+            'category' => $category
+        );
+        array_push($quotes_arr, $quote_item);
     }
-    if (isset($_GET['category_id'])) {
-        $quotes->category_id = $_GET['category_id'];
-    }
- 
-    // Execute query
-    $result = $quotes->read();
-    $num = $result->rowCount();
- 
-    $quotes_arr = array();
- 
-    if ($num > 0) {
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            // Each row must have keys: id, quote, author, and category
-            extract($row);
-            $quote_item = array(
-                'id'       => $id,
-                'quote'    => html_entity_decode($quote),
-                'author'   => $author,
-                'category' => $category
-            );
-            $quotes_arr[] = $quote_item;
-        }
-        echo json_encode($quotes_arr);
-    } else {
-        // Always return an array (empty array if no quotes found)
-        echo json_encode([]);
-    }
+    // Return the array as JSON
+    echo json_encode($quotes_arr);
+} else {
+    // Return an empty array if no quotes are found
+    echo json_encode([]);
+}
 ?>
