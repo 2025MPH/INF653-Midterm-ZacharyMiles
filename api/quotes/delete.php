@@ -1,41 +1,31 @@
 <?php
-    //Headers
-    header('Access-Control-Allow-Origin: *');
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Methods: DELETE');
-    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: DELETE");
+header("Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With");
 
-    include_once '../../config/Database.php';
-    include_once '../../models/Quote.php';
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
+$database = new Database();
+$db = $database->connect();
 
-    //Instantiate DB and CONNECT
-    $database = new Database();
-    $db = $database->connect();
+$quo = new Quote($db);
+$data = json_decode(file_get_contents("php://input"));
 
+if (!isset($data->id)) {
+    http_response_code(400);
+    echo json_encode(["message" => "Missing Required Parameters"]);
+    exit();
+}
 
-    //Instantiate blog quote object
-    $quo = new Quote($db);
+$quo->id = $data->id;
 
-    //Get the raw posted data
-    $data = json_decode(file_get_contents("php://input"));
-
-    //data is not set
-    if(!isset($data->id)){
-        echo(json_encode(array('message' => 'Missing Required parameters')));
-        exit();
-    }
-
-    //SET ID TO UPDATE
-    $quo->id = $data->id;
-
-    //delete post
-    if($quo->delete()){
-        echo json_encode(
-            array('id' => $quo->id)
-        );
-    } else {
-        echo json_encode(
-            array('message' => 'No Quotes Found')
-        );
-    }
+if ($quo->delete()) {
+    http_response_code(200);
+    echo json_encode(["id" => $quo->id]);
+} else {
+    http_response_code(404);
+    echo json_encode(["message" => "No Quotes Found"]);
+}
+?>
