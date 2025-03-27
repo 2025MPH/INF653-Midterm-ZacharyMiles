@@ -83,39 +83,28 @@
 
         //Get single post
         public function read_single(){
-            //create query
-            $query = "SELECT
-                     q.id,
-                     q.quote,
-                     a.author as author,
-                     c.category as category
-                     FROM " . $this->table . " q
-                     INNER JOIN authors a on q.author_id = a.id
-                     INNER JOIN categories c on q.category_id = c.id
-                     WHERE q.id = :id
-                     LIMIT 1 OFFSET 0";
-
-            //prepare statement
+            $query = "SELECT 
+                        q.id,
+                        q.quote,
+                        COALESCE(a.author, 'Unknown') AS author,
+                        COALESCE(c.category, 'Unknown') AS category
+                      FROM " . $this->table . " q
+                      LEFT JOIN authors a ON q.author_id = a.id
+                      LEFT JOIN categories c ON q.category_id = c.id
+                      WHERE q.id = :id
+                      LIMIT 1";
             $stmt = $this->conn->prepare($query);
-
-            //bind the param/id
             $stmt->bindParam(':id', $this->id);
-
-            //execute statement
             $stmt->execute();
-
-            //fetch data
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            //set properties if there is data set
             if($row){
                 $this->id = $row['id'];
                 $this->quote = $row['quote'];
-                $this->category = $row['category'];
                 $this->author = $row['author'];
+                $this->category = $row['category'];
                 return true;
-            } else{
-                return false; //no data
+            } else {
+                return false;
             }
         }
         
