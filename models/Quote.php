@@ -15,19 +15,19 @@ class Quote {
     public $category;  // Category name
 
     // Constructor with DB connection
-    public function __construct($db) {
+    public function __construct($db){
         $this->conn = $db;
     }
 
     // Read quotes – supports filtering if author_id and/or category_id are set.
-    // Uses LEFT JOIN so that every quote is returned even if join data is missing.
+    // Uses LEFT JOIN to ensure every quote is returned even if join data is missing.
     public function read(){
         if (isset($this->author_id) && isset($this->category_id)){
             $query = "SELECT
                         q.id,
                         q.quote,
-                        a.author as author,
-                        c.category as category
+                        a.author AS author,
+                        c.category AS category
                       FROM " . $this->table . " q
                       LEFT JOIN authors a ON q.author_id = a.id
                       LEFT JOIN categories c ON q.category_id = c.id
@@ -37,8 +37,8 @@ class Quote {
             $query = "SELECT
                         q.id,
                         q.quote,
-                        a.author as author,
-                        c.category as category
+                        a.author AS author,
+                        c.category AS category
                       FROM " . $this->table . " q
                       LEFT JOIN authors a ON q.author_id = a.id
                       LEFT JOIN categories c ON q.category_id = c.id
@@ -48,8 +48,8 @@ class Quote {
             $query = "SELECT
                         q.id,
                         q.quote,
-                        a.author as author,
-                        c.category as category
+                        a.author AS author,
+                        c.category AS category
                       FROM " . $this->table . " q
                       LEFT JOIN authors a ON q.author_id = a.id
                       LEFT JOIN categories c ON q.category_id = c.id
@@ -58,8 +58,8 @@ class Quote {
             $query = "SELECT
                         q.id,
                         q.quote,
-                        a.author as author,
-                        c.category as category
+                        a.author AS author,
+                        c.category AS category
                       FROM " . $this->table . " q
                       LEFT JOIN authors a ON q.author_id = a.id
                       LEFT JOIN categories c ON q.category_id = c.id
@@ -67,18 +67,17 @@ class Quote {
         }
         
         $stmt = $this->conn->prepare($query);
-        if ($this->author_id) {
+        if($this->author_id){
             $stmt->bindParam(':author_id', $this->author_id);
         }
-        if ($this->category_id) {
+        if($this->category_id){
             $stmt->bindParam(':category_id', $this->category_id);
         }
         $stmt->execute();
         return $stmt;
     }
 
-    // Read a single quote by id using LEFT JOIN with COALESCE so that if join data is missing,
-    // default values ("Unknown") are returned.
+    // Read a single quote by id using LEFT JOIN and COALESCE to provide default values.
     public function read_single(){
         $query = "SELECT 
                     q.id,
@@ -94,14 +93,14 @@ class Quote {
         $stmt->bindParam(':id', $this->id);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row) {
+        if($row){
             $this->id       = $row['id'];
             $this->quote    = $row['quote'];
             $this->author   = $row['author'];
             $this->category = $row['category'];
             return true;
-        } else {
-            return false;
+        } else{
+            return false; // No data found
         }
     }
     
@@ -116,7 +115,7 @@ class Quote {
         $stmt->bindParam(':quote', $this->quote);
         $stmt->bindParam(':author_id', $this->author_id);
         $stmt->bindParam(':category_id', $this->category_id);
-        if ($stmt->execute()){
+        if($stmt->execute()){
             $this->id = $this->conn->lastInsertId();
             return true;
         } else {
@@ -125,7 +124,7 @@ class Quote {
         }
     }
 
-    // Update an existing quote (do not update the id)
+    // Update an existing quote
     public function update(){
         $query = 'UPDATE ' . $this->table . '
                   SET quote = :quote, author_id = :author_id, category_id = :category_id
@@ -139,7 +138,7 @@ class Quote {
         $stmt->bindParam(':quote', $this->quote);
         $stmt->bindParam(':author_id', $this->author_id);
         $stmt->bindParam(':category_id', $this->category_id);
-        if ($stmt->execute()){
+        if($stmt->execute()){
             return ($stmt->rowCount() > 0);
         } else {
             printf("Error: %s.\n", $stmt->error);
@@ -153,7 +152,7 @@ class Quote {
         $stmt = $this->conn->prepare($query);
         $this->id = htmlspecialchars(strip_tags($this->id));
         $stmt->bindParam(':id', $this->id);
-        if ($stmt->execute()){
+        if($stmt->execute()){
             return ($stmt->rowCount() > 0);
         } else {
             printf("Error: %s.\n", $stmt->error);
