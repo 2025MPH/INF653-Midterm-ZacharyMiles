@@ -6,33 +6,29 @@
     include_once '../../config/Database.php';
     include_once '../../models/Quote.php';
  
-    //Instantiate DB and CONNECT
+    // Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
  
-    //Instantiate blog quote object
+    // Instantiate quote object
     $quo = new Quote($db);
+    $quo->id = isset($_GET['id']) ? $_GET['id'] : null;
  
-    //GET ID
-    $quo->id = isset($_GET['id']) ? $_GET['id'] : die();// gets the value of that id
- 
-    //GET quote
-    if ($quo->read_single()){
- 
-    //create array
-        $quote_arr = array(
-            'id' => $quo->id,
-            'quote' => $quo->quote,
-            'author' => $quo->author,
-            'category' => $quo->category
- 
-        );
-    } else {
-        $quote_arr = array(
-            'message' => 'No Quotes Found'
-        );
+    if ($quo->id === null) {
+        echo json_encode(["message" => "Missing Required Parameters"]);
+        exit();
     }
  
-    //Make JSON
-    print_r(json_encode($quote_arr));
+    // Use read_single() to get the quote data (uses LEFT JOIN with COALESCE)
+    if ($quo->read_single()){
+        $quote_item = array(
+            "id"       => $quo->id,
+            "quote"    => $quo->quote,
+            "author"   => $quo->author,
+            "category" => $quo->category
+        );
+        echo json_encode($quote_item);
+    } else {
+        echo json_encode(["message" => "No Quotes Found"]);
+    }
 ?>

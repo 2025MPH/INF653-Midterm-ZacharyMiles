@@ -1,5 +1,4 @@
 <?php
-    //Headers
     header('Access-Control-Allow-Origin: *');
     header('Content-Type: application/json');
     header('Access-Control-Allow-Methods: POST');
@@ -8,27 +7,21 @@
     include_once '../../config/Database.php';
     include_once '../../models/Author.php';
  
-    //Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
  
-    //Instantiate blog author object
     $aut = new Author($db);
- 
-    //Get the raw posted data
     $data = json_decode(file_get_contents("php://input"));
  
-    //if data is not all set, send error message and exit
-    if ( !isset($data->author) )
-    {
-        echo json_encode(array('message' => 'Missing Required Parameters'));
+    if (!isset($data->author)) {
+        echo json_encode(["message" => "Missing Required Parameters"]);
         exit();
     } else {
         $aut->author = $data->author;
         if ($aut->create()){
-            echo json_encode(array('id' => $db->lastInsertId(), 'author'=>$aut->author));
+            echo json_encode(["id" => $db->lastInsertId(), "author" => $aut->author]);
         } else {
-            echo json_encode(array('message' => 'Author Not Created'));
+            echo json_encode(["message" => "Author Not Created"]);
         }
     }
 ?>

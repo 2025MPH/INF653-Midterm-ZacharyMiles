@@ -8,33 +8,23 @@
     include_once '../../config/Database.php';
     include_once '../../models/Quote.php';
  
-    //Instantiate DB and CONNECT
+    // Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
  
-    //Instantiate blog quote object
     $quo = new Quote($db);
- 
-    //Get the raw posted data
     $data = json_decode(file_get_contents("php://input"));
  
-    //data is not set
-    if(!isset($data->id)){
-        echo(json_encode(array('message' => 'Missing Required parameters')));
+    if (!isset($data->id)) {
+        echo json_encode(["message" => "Missing Required Parameters"]);
         exit();
     }
  
-    //SET ID TO UPDATE
     $quo->id = $data->id;
  
-    //delete post
-    if($quo->delete()){
-        echo json_encode(
-            array('id' => $quo->id)
-        );
+    if ($quo->delete()) {
+        echo json_encode(["id" => $quo->id]);
     } else {
-        echo json_encode(
-            array('message' => 'No Quotes Found')
-        );
+        echo json_encode(["message" => "No Quotes Found"]);
     }
 ?>
