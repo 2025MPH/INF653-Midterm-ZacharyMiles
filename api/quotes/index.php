@@ -9,8 +9,7 @@
          header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
          exit();
      } 
-
-
+ 
     // If statement for type of request
      if ($method === 'GET') {
         try {
@@ -18,7 +17,7 @@
             require_once 'read_single.php' ;
            else
             require_once 'read.php';
-
+ 
         }
         catch(ErrorException $e)
         {
@@ -29,7 +28,7 @@
      else if ($method === 'POST') {
         try {
             require_once 'create.php';
-
+ 
         }
         catch(ErrorException $e)
         {
@@ -40,7 +39,7 @@
      else if ($method === 'PUT') {
         try {
             require_once 'update.php';
-
+ 
         }
         catch(ErrorException $e)
         {
@@ -51,7 +50,7 @@
      else if ($method === 'DELETE') {
         try {
             require_once 'delete.php';
-
+ 
         }
         catch(ErrorException $e)
         {
@@ -61,3 +60,4 @@
      }
      else
         echo ("No function requested");
+?>
