@@ -1,5 +1,0 @@
-SetEnv USERNAME "zsmiles"
-SetEnv PASSWORD "Btab0uFR0RKNGjxKnZJyuRpOq4k8FvQI"
-SetEnv DBNAME "quotesdb"
-SetEnv HOST "dpg-cvfjpn52ng1s73d7glj0-a.ohio-postgres.render.com"
-SetEnv PORT "5432"
