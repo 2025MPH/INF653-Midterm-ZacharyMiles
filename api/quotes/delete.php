@@ -39,4 +39,3 @@
             array('message' => 'No Quotes Found')
         );
     }
-?>
