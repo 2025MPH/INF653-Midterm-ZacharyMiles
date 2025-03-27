@@ -1,4 +1,5 @@
 <?php
+// Author.php
 class Author {
     private $conn;
     private $table = 'authors';

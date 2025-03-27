@@ -1,4 +1,6 @@
 <?php
+/// index.php This file acts as the central router for the Authors API. It routes GET, POST, PUT, and DELETE requests to the corresponding files.
+ 
 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');

@@ -1,12 +1,4 @@
 <?php
-/**
- * index.php
- * 
- * This file acts as the central router for the Quotes API. It inspects the HTTP method
- * of the request and routes the request to the appropriate file (read, read_single, create, update, or delete).
- * 
- * All responses are returned as JSON.
- */
 
 // Set CORS and content type headers
 header('Access-Control-Allow-Origin: *');

@@ -1,11 +1,4 @@
 <?php
-/**
- * read_single.php
- * 
- * This file retrieves a single quote based on the provided id parameter.
- * It returns a JSON object with keys: id, quote, author, and category.
- * If the quote is not found, it returns a JSON error message.
- */
 
 // Set headers for CORS and content type
 header('Access-Control-Allow-Origin: *');

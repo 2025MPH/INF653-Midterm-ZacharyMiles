@@ -1,12 +1,4 @@
 <?php
-/**
- * create.php
- * 
- * This file creates a new quote record in the database.
- * It first validates that all required fields (quote, author_id, category_id) are provided.
- * It then checks that the provided author_id and category_id refer to existing records.
- * On success, it returns a JSON object representing the created quote.
- */
 
 // Set headers for CORS, content type, and allowed methods
 header('Access-Control-Allow-Origin: *');

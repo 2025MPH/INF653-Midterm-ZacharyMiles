@@ -1,11 +1,4 @@
 <?php
-/**
- * read.php
- * 
- * This file retrieves a list of quotes from the database. It supports optional filtering 
- * by author_id and/or category_id via GET parameters. It always returns a JSON array.
- * If no records are found, it returns an empty array.
- */
 
 // Set CORS and content-type headers
 header('Access-Control-Allow-Origin: *');

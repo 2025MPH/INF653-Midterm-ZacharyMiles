@@ -1,4 +1,6 @@
 <?php
+// read.php Retrieves all authors from the database and returns them as a JSON array.
+
 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');

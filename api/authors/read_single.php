@@ -1,5 +1,6 @@
 <?php
-
+//Retrieves a single author by id and returns it as a JSON object.
+ 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 

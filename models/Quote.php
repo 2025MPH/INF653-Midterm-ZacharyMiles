@@ -1,4 +1,5 @@
 <?php
+// Quote.php
 class Quote {
     // Database connection and table name
     private $conn;
