@@ -15,12 +15,13 @@ if ($quo->id == null) {
 }
 
 if ($quo->read_single()){
-    echo json_encode([
+    $quote_item = array(
         "id"       => $quo->id,
         "quote"    => $quo->quote,
         "author"   => $quo->author,
         "category" => $quo->category
-    ]);
+    );
+    echo json_encode($quote_item);
 } else {
     echo json_encode(["message" => "No Quotes Found"]);
 }
