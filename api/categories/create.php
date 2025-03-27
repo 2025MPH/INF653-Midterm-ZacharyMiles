@@ -8,19 +8,15 @@
     include_once '../../config/Database.php';
     include_once '../../models/Category.php';
  
- 
     //Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
  
- 
     //Instantiate blog Category object
     $cat = new Category($db);
  
- 
     //Get the raw posted data
     $data = json_decode(file_get_contents("php://input"));
- 
  
     //if data is not all set, send error message and exit
     if ( !isset($data->category) )
@@ -32,3 +28,4 @@
         echo json_encode(array('id' => $db->lastInsertId(), 'category'=>$cat->category));
  
     }
+?>

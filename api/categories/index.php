@@ -11,7 +11,6 @@
      }
  
      // If statement for type of request
- 
      if ($method === 'GET') {
         try {
             if (isset($_GET['id']) )
@@ -61,3 +60,4 @@
      }
      else
         echo ("No function requested");
+?>

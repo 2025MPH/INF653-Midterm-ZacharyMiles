@@ -6,11 +6,9 @@
     include_once '../../config/Database.php';
     include_once '../../models/Category.php';
  
- 
     //Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
- 
  
     //Instantiate blog category object
     $cat = new Category($db);
@@ -46,3 +44,4 @@
             array('message' => 'category_id Not Found')
         );
     }
+?>
