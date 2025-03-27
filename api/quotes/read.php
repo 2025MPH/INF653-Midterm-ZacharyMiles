@@ -6,53 +6,43 @@
     include_once '../../config/Database.php';
     include_once '../../models/Quote.php';
 
-
     //Instantiate DB and CONNECT
     $database = new Database();
     $db = $database->connect();
 
-
-    //Instantiate blog quote object
+    //Instantiate quote object
     $quotes = new Quote($db);
 
-    //get data if only it is set
-    if (isset($_GET['author_id'])){
+    //If filters are set, assign them
+    if (isset($_GET['author_id'])) {
         $quotes->author_id = $_GET['author_id'];
     }
-    if (isset($_GET['category_id'])){
+    if (isset($_GET['category_id'])) {
         $quotes->category_id = $_GET['category_id'];
     }
 
-    //Blog quote query
+    //Execute query
     $result = $quotes->read();
-
-    //Get row count
     $num = $result->rowCount();
 
-    //Check if any quotes
-    if($num>0){
-        // quote array
-        $quotes_arr = array();
+    //Initialize array to hold quotes
+    $quotes_arr = array();
 
-        while($row = $result->fetch(PDO::FETCH_ASSOC)){
+    if ($num > 0) {
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            // Each row should have id, quote, author, and category
             extract($row);
-
             $quote_item = array(
-                'id' => $id,
-                'author' => $author,
-                'quote' => html_entity_decode($quote),
+                'id'       => $id,
+                'quote'    => html_entity_decode($quote),
+                'author'   => $author,
                 'category' => $category
             );
-
-            //push to "data
-            array_push($quotes_arr, $quote_item);
+            $quotes_arr[] = $quote_item;
         }
-
-        //Turn to JSON & output
         echo json_encode($quotes_arr);
     } else {
-        //NO quotes
-        echo json_encode(
-            array('message' => 'No Quotes Found')
-        );
+        // Return an empty array instead of a message object
+        echo json_encode([]);
     }
+?>
